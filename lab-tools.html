@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Toolbox Pro | 实验室专属工具箱</title>
+    <style>
+        /* 现代化设计系统变量 */
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #0f172a;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --success-bg: #ecfdf5;
+            --success-border: #10b981;
+            --error-bg: #fef2f2;
+            --error-border: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+        
+        /* 侧边栏 - 深色科技感 */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            padding: 24px 20px;
+            margin: 0;
+            font-size: 1.25rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .nav-menu {
+            padding: 15px 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+            font-weight: 600;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .lang-toggle {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .lang-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 工具卡片区域 */
+        .tool-section {
+            display: none;
+            max-width: 850px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        h1 {
+            color: var(--sidebar-bg);
+            margin-top: 0;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--bg-color);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 表单与输入框优化 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: var(--text-main);
+            background-color: #f8fafc;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        
+        button.calc-btn {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 25px;
+            width: 100%;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+            transition: var(--transition);
+        }
+
+        button.calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* 结果显示区美化 */
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .result-box.success {
+            background-color: var(--success-bg);
+            border-left: 4px solid var(--success-border);
+            display: block;
+        }
+
+        .result-box.error {
+            background-color: var(--error-bg);
+            border-left: 4px solid var(--error-border);
+            display: block;
+        }
+
+        .result-box h3 { margin-top: 0; color: #065f46; }
+
+        /* 数据块矩阵 */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .metric span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-top: 8px;
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+        <h2>🧪 Lab Toolbox Pro</h2>
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="showTab('t-home', this)">🏠 <span class="en">Home</span><span class="zh" style="display:none;">使用指南</span></button>
+            <button class="nav-btn" onclick="showTab('t-dna', this)">🧬 <span class="en">DNA Analyzer</span><span class="zh" style="display:none;">DNA 序列分析</span></button>
+            <button class="nav-btn" onclick="showTab('t-pcr', this)">🧫 <span class="en">PCR Master Mix</span><span class="zh" style="display:none;">PCR 体系配制</span></button>
+            <button class="nav-btn" onclick="showTab('t-sol', this)">⚖️ <span class="en">Make Solutions</span><span class="zh" style="display:none;">溶液配制质量</span></button>
+            <button class="nav-btn" onclick="showTab('t-dil', this)">🧪 <span class="en">Dilute Stock</span><span class="zh" style="display:none;">溶液稀释 (C1V1)</span></button>
+            <button class="nav-btn" onclick="showTab('t-lig', this)">🔗 <span class="en">Ligation Calc</span><span class="zh" style="display:none;">载体片段连接</span></button>
+            <button class="nav-btn" onclick="showTab('t-sds', this)">🧱 <span class="en">SDS-PAGE Recipe</span><span class="zh" style="display:none;">蛋白胶配方计算</span></button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <button class="lang-toggle" onclick="toggleLang()">🌐 中英切换 / EN-ZH</button>
+
+        <!-- 0. Home -->
+        <div id="t-home" class="tool-section active card">
+            <h1>🏠 <span class="en">Welcome to Lab Toolbox</span><span class="zh" style="display:none;">欢迎使用专属实验室工具箱</span></h1>
+            <p style="line-height: 1.6; color: var(--text-light); font-size: 1.1rem;">
+                <span class="en">Please select a tool from the left sidebar to begin your calculations. All formulas are accurately translated from your original Python script and optimized for web performance.</span>
+                <span class="zh" style="display:none;">请从左侧边栏选择您需要的工具。所有的计算逻辑都已按照您的原始配置完美迁移，并进行了全平台的自适应优化。实验顺利！🚀</span>
+            </p>
+        </div>
+
+        <!-- 1. DNA Analyzer -->
+        <div id="t-dna" class="tool-section card">
+            <h1>🧬 <span class="en">DNA Primer Analyzer</span><span class="zh" style="display:none;">DNA 序列分析</span></h1>
+            <div class="form-group">
+                <label><span class="en">Enter DNA sequence (5' to 3'):</span><span class="zh" style="display:none;">输入DNA序列 (5' -> 3'):</span></label>
+                <textarea id="dna-seq" rows="5" placeholder="ATGC..."></textarea>
+            </div>
+            <button class="calc-btn" onclick="calcDNA()"><span class="en">Analyze Sequence</span><span class="zh" style="display:none;">一键分析序列</span></button>
+            <div id="dna-res" class="result-box"></div>
+        </div>
+
+        <!-- 2. PCR Master Mix -->
+        <div id="t-pcr" class="tool-section card">
+            <h1>🧫 <span class="en">PCR Master Mix Calculator</span><span class="zh" style="display:none;">PCR 体系配制计算器</span></h1>
+            
+            <div class="grid-3 form-group">
+                <div><label><span class="en">Tubes (N):</span><span class="zh" style="display:none;">实验管数 (N):</span></label><input type="number" id="pcr-n" value="5"></div>
+                <div><label><span class="en">Overage (%):</span><span class="zh" style="display:none;">移液损耗冗余 (%):</span></label><input type="number" id="pcr-ov" value="10"></div>
+                <div><label><span class="en">Vol/Tube (µL):</span><span class="zh" style="display:none;">单管最终体积 (µL):</span></label><input type="number" id="pcr-tot" value="20"></div>
+            </div>
+
+            <div style="margin: 30px 0 15px; padding-bottom: 10px; border-bottom: 2px dashed var(--border-color);">
+                <span style="font-weight:bold; color: var(--primary);">
+                    <span class="en">Volumes for ONE reaction (µL):</span><span class="zh" style="display:none;">单管原始配方用量 (µL):</span>
+                </span>
+            </div>
+
+            <div class="grid-2 form-group">
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div><label>Buffer (缓冲液):</label><input type="number" id="pcr-buf" value="2.0" step="0.1"></div>
+                    <div><label>F-Primer (上游引物):</label><input type="number" id="pcr-fp" value="0.5" step="0.1"></div>
+                    <div><label>Polymerase (酶):</label><input type="number" id="pcr-pol" value="0.2" step="0.1"></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div><label>dNTPs:</label><input type="number" id="pcr-dntp" value="0.4" step="0.1"></div>
+                    <div><label>R-Primer (下游引物):</label><input type="number" id="pcr-rp" value="0.5" step="0.1"></div>
+                    <div><label>Template DNA (模板):</label><input type="number" id="pcr-tmp" value="1.0" step="0.1"></div>
+                </div>
+            </div>
+
+            <button class="calc-btn" onclick="calcPCR()"><span class="en">Calculate Master Mix</span><span class="zh" style="display:none;">计算混合液配制表</span></button>
+            <div id="pcr-res" class="result-box"></div>
+        </div>
+
+        <!-- 3. Make Solutions -->
+        <div id="t-sol" class="tool-section card">
+            <h1>⚖️ <span class="en">Make Solutions</span><span class="zh" style="display:none;">溶液配制 (所需质量计算)</span></h1>
+            <div class="grid-2 form-group">
+                <div><label><span class="en">Target Conc:</span><span class="zh" style="display:none;">目标浓度:</span></label><input type="number" id="sol-c" value="10"></div>
+                <div><label><span class="en">Unit:</span><span class="zh" style="display:none;">单位:</span></label>
+                    <select id="sol-cu"><option value="1e-6">µM</option><option value="1e-3" selected>mM</option><option value="1">M</option></select>
+                </div>
+            </div>
+            <div class="grid-2 form-group">
+                <div><label><span class="en">Target Volume:</span><span class="zh" style="display:none;">目标总体积:</span></label><input type="number" id="sol-v" value="100"></div>
+                <div><label><span class="en">Unit:</span><span class="zh" style="display:none;">单位:</span></label>
+                    <select id="sol-vu"><option value="1e-6">µL</option><option value="1e-3" selected>mL</option><option value="1">L</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><span class="en">Molecular Weight (g/mol):</span><span class="zh" style="display:none;">溶质分子量 (MW, g/mol):</span></label>
+                <input type="number" id="sol-mw" value="100">
+            </div>
+            <button class="calc-btn" onclick="calcSol()"><span class="en">Calculate Mass</span><span class="zh" style="display:none;">计算称量质量</span></button>
+            <div id="sol-res" class="result-box"></div>
+        </div>
+
+        <!-- 4. Dilute Stock -->
+        <div id="t-dil" class="tool-section card">
+            <h1>🧪 <span class="en">Dilute Stock (C1V1 = C2V2)</span><span class="zh" style="display:none;">母液稀释计算</span></h1>
+            <div class="grid-2 form-group">
+                <div><label>Stock Conc (C1):</label><input type="number" id="dil-c1" value="100"></div>
+                <div><label>Final Conc (C2):</label><input type="number" id="dil-c2" value="10"></div>
+            </div>
+            <div class="grid-2 form-group">
+                <div><label>Final Volume (V2):</label><input type="number" id="dil-v2" value="1000"></div>
+                <div><label>V2 Unit:</label><select id="dil-vu"><option value="1">µL</option><option value="1000" selected>mL</option></select></div>
+            </div>
+            <button class="calc-btn" onclick="calcDil()"><span class="en">Calculate Volume</span><span class="zh" style="display:none;">计算吸取体积</span></button>
+            <div id="dil-res" class="result-box"></div>
+        </div>
+        
+        <!-- 5. Ligation -->
+        <div id="t-lig" class="tool-section card">
+            <h1>🔗 <span class="en">Ligation Calculator</span><span class="zh" style="display:none;">载体与片段连接体系</span></h1>
+            <div class="grid-2 form-group">
+                <div><label>Insert Conc (片段浓度 ng/µL):</label><input type="number" id="lig-ic" value="50"></div>
+                <div><label>Insert Length (片段长度 bp):</label><input type="number" id="lig-il" value="1000"></div>
+            </div>
+            <div class="grid-2 form-group">
+                <div><label>Vector Conc (载体浓度 ng/µL):</label><input type="number" id="lig-vc" value="50"></div>
+                <div><label>Vector Length (载体长度 bp):</label><input type="number" id="lig-vl" value="5000"></div>
+            </div>
+            <div class="grid-2 form-group">
+                <div><label>Molar Ratio Insert (摩尔比-片段):</label><input type="number" id="lig-ri" value="3"></div>
+                <div><label>Molar Ratio Vector (摩尔比-载体):</label><input type="number" id="lig-rv" value="1"></div>
+            </div>
+            <div class="form-group">
+                <label>Target Vector Mass (目标载体质量 ng):</label><input type="number" id="lig-tm" value="50">
+            </div>
+            <button class="calc-btn" onclick="calcLig()"><span class="en">Calculate Volumes</span><span class="zh" style="display:none;">计算加样体积</span></button>
+            <div id="lig-res" class="result-box"></div>
+        </div>
+
+        <!-- 12. SDS PAGE -->
+        <div id="t-sds" class="tool-section card">
+            <h1>🧱 <span class="en">SDS-PAGE Recipe</span><span class="zh" style="display:none;">SDS-PAGE 蛋白胶配方</span></h1>
+            <div class="grid-2 form-group">
+                <div><label><span class="en">Resolving Volume (mL):</span><span class="zh" style="display:none;">分离胶体积 (mL):</span></label><input type="number" id="sds-rv" value="5"></div>
+                <div><label><span class="en">Gel Percentage (%):</span><span class="zh" style="display:none;">分离胶浓度 (%):</span></label><input type="number" id="sds-pct" value="10"></div>
+            </div>
+            <div class="form-group">
+                <label><span class="en">Stacking Volume (mL):</span><span class="zh" style="display:none;">浓缩胶 (5%) 体积 (mL):</span></label><input type="number" id="sds-sv" value="2">
+            </div>
+            <button class="calc-btn" onclick="calcSDS()"><span class="en">Calculate Recipe</span><span class="zh" style="display:none;">生成配胶方案</span></button>
+            <div id="sds-res" class="result-box"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 界面交互逻辑 ---
+        let isEn = true;
+        
+        function toggleLang() {
+            isEn = !isEn;
+            document.querySelectorAll('.en').forEach(el => el.style.display = isEn ? 'inline' : 'none');
+            document.querySelectorAll('.zh').forEach(el => el.style.display = isEn ? 'none' : 'inline');
+        }
+
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // --- 核心计算逻辑 ---
+
+        // 1. DNA 分析
+        function calcDNA() {
+            let seq = document.getElementById('dna-seq').value.toUpperCase().replace(/\s+/g, '');
+            seq = seq.replace(/[^ATCG]/g, '');
+            let len = seq.length;
+            if(len === 0) return;
+            let g = (seq.match(/G/g) || []).length;
+            let c = (seq.match(/C/g) || []).length;
+            let a = (seq.match(/A/g) || []).length;
+            let t = (seq.match(/T/g) || []).length;
+            let tm = 4 * (g + c) + 2 * (a + t);
+            let gc = ((g + c) / len * 100).toFixed(1);
+            let at = ((a + t) / len * 100).toFixed(1);
+            
+            let res = document.getElementById('dna-res');
+            res.className = 'result-box success';
+            res.innerHTML = `
+                <div class="metric-grid">
+                    <div class="metric"><span>Length</span><strong>${len} bp</strong></div>
+                    <div class="metric"><span>Tm Value</span><strong>${tm} °C</strong></div>
+                    <div class="metric"><span>GC %</span><strong>${gc} %</strong></div>
+                    <div class="metric"><span>AT %</span><strong>${at} %</strong></div>
+                </div>`;
+        }
+
+        // 2. PCR 体系配制
+        function calcPCR() {
+            let n = parseFloat(document.getElementById('pcr-n').value);
+            let ov = parseFloat(document.getElementById('pcr-ov').value);
+            let tot = parseFloat(document.getElementById('pcr-tot').value);
+            let buf = parseFloat(document.getElementById('pcr-buf').value);
+            let fp = parseFloat(document.getElementById('pcr-fp').value);
+            let pol = parseFloat(document.getElementById('pcr-pol').value);
+            let dntp = parseFloat(document.getElementById('pcr-dntp').value);
+            let rp = parseFloat(document.getElementById('pcr-rp').value);
+            let tmp = parseFloat(document.getElementById('pcr-tmp').value);
+
+            let water = tot - (buf + dntp + fp + rp + pol + tmp);
+            let res = document.getElementById('pcr-res');
+            
+            if(water < 0) {
+                res.className = 'result-box error';
+                res.innerHTML = "<strong>⚠️ Error:</strong> Components exceed Total Volume!";
+            } else {
+                let mult = n * (1 + ov/100);
+                res.className = 'result-box success';
+                res.innerHTML = `
+                    <h3 style="margin-top:0;">🧪 Mix for <strong>${n} tubes</strong> (Prepared for ${mult.toFixed(1)} rxns)</h3>
+                    <div class="metric-grid" style="text-align:left;">
+                        <div class="metric"><span>ddH2O</span><strong>${(water*mult).toFixed(2)} µL</strong></div>
+                        <div class="metric"><span>Buffer</span><strong>${(buf*mult).toFixed(2)} µL</strong></div>
+                        <div class="metric"><span>dNTPs</span><strong>${(dntp*mult).toFixed(2)} µL</strong></div>
+                        <div class="metric"><span>F-Primer</span><strong>${(fp*mult).toFixed(2)} µL</strong></div>
+                        <div class="metric"><span>R-Primer</span><strong>${(rp*mult).toFixed(2)} µL</strong></div>
+                        <div class="metric"><span>Polymerase</span><strong>${(pol*mult).toFixed(2)} µL</strong></div>
+                    </div>
+                    <p style="margin-top:15px; font-size:0.95rem; color:#047857; background:#d1fae5; padding:10px; border-radius:6px;">
+                        💡 <strong>Protocol:</strong> Aliquot <strong>${(tot-tmp).toFixed(1)} µL</strong> of Master Mix into each tube, then add <strong>${tmp} µL</strong> Template.
+                    </p>
+                `;
+            }
+        }
+
+        // 3. 配制溶液
+        function calcSol() {
+            let c = parseFloat(document.getElementById('sol-c').value);
+            let cu = parseFloat(document.getElementById('sol-cu').value);
+            let v = parseFloat(document.getElementById('sol-v').value);
+            let vu = parseFloat(document.getElementById('sol-vu').value);
+            let mw = parseFloat(document.getElementById('sol-mw').value);
+            
+            let mass_g = (c * cu) * (v * vu) * mw;
+            let display = "";
+            if (mass_g < 0.001) display = (mass_g * 1e6).toFixed(2) + " µg";
+            else if (mass_g < 1) display = (mass_g * 1e3).toFixed(2) + " mg";
+            else display = mass_g.toFixed(4) + " g";
+
+            let res = document.getElementById('sol-res');
+            res.className = 'result-box success';
+            res.innerHTML = `<h3 style="margin:0;">⚖️ Required Mass (需称量质量): <span style="font-size:1.5rem; color:var(--primary);">${display}</span></h3>`;
+        }
+
+        // 4. 稀释溶液
+        function calcDil() {
+            let c1 = parseFloat(document.getElementById('dil-c1').value);
+            let c2 = parseFloat(document.getElementById('dil-c2').value);
+            let v2 = parseFloat(document.getElementById('dil-v2').value);
+            let vu = parseFloat(document.getElementById('dil-vu').value);
+
+            let v1 = (c2 * v2) / c1;
+            let unitStr = vu == 1 ? 'µL' : 'mL';
+            let res = document.getElementById('dil-res');
+            res.className = 'result-box success';
+            res.innerHTML = `
+                <h3 style="margin-top:0;">💧 Action Plan:</h3>
+                <ul style="line-height:1.8; font-size:1.05rem; margin-bottom:0;">
+                    <li>1. Take <strong style="color:var(--primary); font-size:1.2rem;">${v1.toFixed(2)} ${unitStr}</strong> of Stock (C1).</li>
+                    <li>2. Add solvent up to <strong>${v2} ${unitStr}</strong> final volume.</li>
+                </ul>`;
+        }
+
+        // 5. 载体连接
+        function calcLig() {
+            let ic = parseFloat(document.getElementById('lig-ic').value);
+            let il = parseFloat(document.getElementById('lig-il').value);
+            let vc = parseFloat(document.getElementById('lig-vc').value);
+            let vl = parseFloat(document.getElementById('lig-vl').value);
+            let ri = parseFloat(document.getElementById('lig-ri').value);
+            let rv = parseFloat(document.getElementById('lig-rv').value);
+            let tm = parseFloat(document.getElementById('lig-tm').value);
+
+            let req_ins_mass = (ri / rv) * tm * (il / vl);
+            
+            let res = document.getElementById('lig-res');
+            res.className = 'result-box success';
+            res.innerHTML = `
+                <h3 style="margin-top:0;">Required Insert Mass: <span style="color:var(--primary);">${req_ins_mass.toFixed(2)} ng</span></h3>
+                <div class="metric-grid">
+                    <div class="metric"><span>Vol. Vector (载体体积)</span><strong>${(tm / vc).toFixed(2)} µL</strong></div>
+                    <div class="metric"><span>Vol. Insert (片段体积)</span><strong>${(req_ins_mass / ic).toFixed(2)} µL</strong></div>
+                </div>
+            `;
+        }
+
+        // 12. SDS-PAGE
+        function sdsFormula(vol, type, pct) {
+            let acry, tris, sds = 0.01*vol, aps = 0.01*vol, temed = 0.001*vol;
+            if(type === 'res') {
+                acry = (pct / 30.0) * vol;
+                tris = 0.25 * vol;
+            } else {
+                acry = (5.0 / 30.0) * vol;
+                tris = 0.125 * vol;
+            }
+            let water = vol - (acry + tris + sds + aps + temed);
+            return {w:water, a:acry, t:tris, s:sds, ap:aps, tem:temed};
+        }
+
+        function calcSDS() {
+            let rv = parseFloat(document.getElementById('sds-rv').value);
+            let pct = parseFloat(document.getElementById('sds-pct').value);
+            let sv = parseFloat(document.getElementById('sds-sv').value);
+
+            let r = sdsFormula(rv, 'res', pct);
+            let s = sdsFormula(sv, 'stack', 5);
+
+            let res = document.getElementById('sds-res');
+            res.className = 'result-box success';
+            res.innerHTML = `
+                <div class="grid-2">
+                    <div style="background:white; padding:20px; border-radius:8px; border:1px solid #d1d5db;">
+                        <h4 style="color:var(--sidebar-bg); margin-top:0;">🔵 ${pct}% Resolving (分离胶 ${rv} mL)</h4>
+                        <p style="margin:8px 0;">💧 ddH2O: <strong>${r.w.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧪 30% Acrylamide: <strong>${r.a.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧊 1.5M Tris (pH 8.8): <strong>${r.t.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧼 10% SDS: <strong>${(r.s*1000).toFixed(0)} µL</strong></p>
+                        <p style="margin:8px 0;">⚡ 10% APS: <strong>${(r.ap*1000).toFixed(0)} µL</strong></p>
+                        <p style="margin:8px 0;">🔥 TEMED: <strong>${(r.tem*1000).toFixed(1)} µL</strong></p>
+                    </div>
+                    <div style="background:white; padding:20px; border-radius:8px; border:1px solid #d1d5db;">
+                        <h4 style="color:var(--sidebar-bg); margin-top:0;">🟢 5% Stacking (浓缩胶 ${sv} mL)</h4>
+                        <p style="margin:8px 0;">💧 ddH2O: <strong>${s.w.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧪 30% Acrylamide: <strong>${s.a.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧊 1.0M Tris (pH 6.8): <strong>${s.t.toFixed(2)} mL</strong></p>
+                        <p style="margin:8px 0;">🧼 10% SDS: <strong>${(s.s*1000).toFixed(0)} µL</strong></p>
+                        <p style="margin:8px 0;">⚡ 10% APS: <strong>${(s.ap*1000).toFixed(0)} µL</strong></p>
+                        <p style="margin:8px 0;">🔥 TEMED: <strong>${(s.tem*1000).toFixed(1)} µL</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
