@@ -2,54 +2,94 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>序列范围提取器</title>
+    <title>序列截取小工具 | Sequence Extractor</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; }
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; position: relative; }
         textarea { width: 100%; height: 150px; margin-bottom: 10px; }
         input { margin-bottom: 10px; padding: 5px; width: 100px; }
-        button { padding: 8px 15px; cursor: pointer; }
-        #resultArea { margin-top: 20px; padding: 10px; background: #f4f4f4; word-wrap: break-word; }
+        .extract-btn { padding: 8px 15px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        .extract-btn:hover { background-color: #0056b3; }
+        #resultArea { margin-top: 20px; padding: 10px; background: #f4f4f4; word-wrap: break-word; border-radius: 4px; }
+        
+        /* 语言切换按钮样式 */
+        .lang-btn { position: absolute; top: 10px; right: 10px; padding: 5px 10px; cursor: pointer; background-color: #e0e0e0; border: none; border-radius: 15px; font-size: 14px; }
+        .lang-btn:hover { background-color: #ccc; }
     </style>
 </head>
 <body>
 
-    <h2>序列截取小工具</h2>
+    <!-- 语言切换按钮 -->
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">English</button>
+
+    <h2 id="t-title">序列截取小工具</h2>
     
-    <label>粘贴原始序列 (带换行也没关系):</label>
+    <label id="t-label1">粘贴原始序列 (支持带换行或FASTA格式):</label>
     <textarea id="rawSeq"></textarea>
 
-    <label>起始位置:</label>
+    <label id="t-label2">起始位置 (Start):</label>
     <input type="number" id="startPos" value="300">
     <br>
     
-    <label>结束位置:</label>
+    <label id="t-label3">结束位置 (End):</label>
     <input type="number" id="endPos" value="624">
     <br>
 
-    <button onclick="extractSequence()">提取序列</button>
+    <button class="extract-btn" onclick="extractSequence()" id="t-btn1">提取序列</button>
 
     <div id="resultArea">
-        <p><strong>提取结果:</strong></p>
-        <p id="outputSeq">这里显示结果</p>
-        <p><strong>长度:</strong> <span id="seqLen">0</span> aa</p>
+        <p><strong id="t-res">提取结果:</strong></p>
+        <p id="outputSeq">这里显示结果 / Result will appear here</p>
+        <p><strong id="t-len">长度:</strong> <span id="seqLen">0</span> aa</p>
     </div>
 
     <script>
+        // 字典：存储中英文文本
+        let isZh = true;
+        const dict = {
+            "title": { zh: "序列截取小工具", en: "Sequence Extractor Tool" },
+            "label1": { zh: "粘贴原始序列 (支持带换行或FASTA格式):", en: "Paste raw sequence (supports line breaks or FASTA):" },
+            "label2": { zh: "起始位置 (Start):", en: "Start Position:" },
+            "label3": { zh: "结束位置 (End):", en: "End Position:" },
+            "btn1": { zh: "提取序列", en: "Extract Sequence" },
+            "res": { zh: "提取结果:", en: "Extraction Result:" },
+            "len": { zh: "长度:", en: "Length:" },
+            "err": { zh: "输入的数字超出范围，或者序列为空！", en: "Invalid range or empty sequence!" }
+        };
+
+        // 切换语言功能
+        function toggleLang() {
+            isZh = !isZh;
+            document.getElementById('langBtn').innerText = isZh ? "English" : "中文";
+            document.getElementById('t-title').innerText = dict.title[isZh ? 'zh' : 'en'];
+            document.getElementById('t-label1').innerText = dict.label1[isZh ? 'zh' : 'en'];
+            document.getElementById('t-label2').innerText = dict.label2[isZh ? 'zh' : 'en'];
+            document.getElementById('t-label3').innerText = dict.label3[isZh ? 'zh' : 'en'];
+            document.getElementById('t-btn1').innerText = dict.btn1[isZh ? 'zh' : 'en'];
+            document.getElementById('t-res').innerText = dict.res[isZh ? 'zh' : 'en'];
+            document.getElementById('t-len').innerText = dict.len[isZh ? 'zh' : 'en'];
+
+            // 如果当前显示的是报错信息，也同步切换语言
+            let currentOutput = document.getElementById('outputSeq').innerText;
+            if(currentOutput === dict.err.zh || currentOutput === dict.err.en) {
+                document.getElementById('outputSeq').innerText = dict.err[isZh ? 'zh' : 'en'];
+            }
+        }
+
+        // 提取序列功能
         function extractSequence() {
             let rawText = document.getElementById('rawSeq').value;
             let start = parseInt(document.getElementById('startPos').value);
             let end = parseInt(document.getElementById('endPos').value);
 
-            // 核心逻辑：去掉首行 > 描述信息，去掉所有空白符和换行符
+            // 清洗序列
             let cleanSeq = rawText.replace(/^>.*[\r\n]+/g, '').replace(/\s+/g, '');
 
             if(start > 0 && end >= start && end <= cleanSeq.length) {
-                // JavaScript的索引是从0开始的，所以start要减1
                 let result = cleanSeq.substring(start - 1, end);
                 document.getElementById('outputSeq').innerText = result;
                 document.getElementById('seqLen').innerText = result.length;
             } else {
-                document.getElementById('outputSeq').innerText = "输入的数字超出范围，或者序列为空！";
+                document.getElementById('outputSeq').innerText = dict.err[isZh ? 'zh' : 'en'];
                 document.getElementById('seqLen').innerText = "0";
             }
         }
