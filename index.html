@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>序列范围提取器</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; }
+        textarea { width: 100%; height: 150px; margin-bottom: 10px; }
+        input { margin-bottom: 10px; padding: 5px; width: 100px; }
+        button { padding: 8px 15px; cursor: pointer; }
+        #resultArea { margin-top: 20px; padding: 10px; background: #f4f4f4; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+    <h2>序列截取小工具</h2>
+    
+    <label>粘贴原始序列 (带换行也没关系):</label>
+    <textarea id="rawSeq"></textarea>
+
+    <label>起始位置:</label>
+    <input type="number" id="startPos" value="300">
+    <br>
+    
+    <label>结束位置:</label>
+    <input type="number" id="endPos" value="624">
+    <br>
+
+    <button onclick="extractSequence()">提取序列</button>
+
+    <div id="resultArea">
+        <p><strong>提取结果:</strong></p>
+        <p id="outputSeq">这里显示结果</p>
+        <p><strong>长度:</strong> <span id="seqLen">0</span> aa</p>
+    </div>
+
+    <script>
+        function extractSequence() {
+            let rawText = document.getElementById('rawSeq').value;
+            let start = parseInt(document.getElementById('startPos').value);
+            let end = parseInt(document.getElementById('endPos').value);
+
+            // 核心逻辑：去掉首行 > 描述信息，去掉所有空白符和换行符
+            let cleanSeq = rawText.replace(/^>.*[\r\n]+/g, '').replace(/\s+/g, '');
+
+            if(start > 0 && end >= start && end <= cleanSeq.length) {
+                // JavaScript的索引是从0开始的，所以start要减1
+                let result = cleanSeq.substring(start - 1, end);
+                document.getElementById('outputSeq').innerText = result;
+                document.getElementById('seqLen').innerText = result.length;
+            } else {
+                document.getElementById('outputSeq').innerText = "输入的数字超出范围，或者序列为空！";
+                document.getElementById('seqLen').innerText = "0";
+            }
+        }
+    </script>
+
+</body>
+</html>
